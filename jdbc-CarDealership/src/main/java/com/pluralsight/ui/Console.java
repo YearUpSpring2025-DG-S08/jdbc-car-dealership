@@ -18,7 +18,7 @@ public class Console {
                 hasResult = true;
 
             } catch (Exception e) {
-                System.out.println("Invalid entry");
+                System.out.println("Invalid input. Please enter a string value");
                 scanner.next();
             }
         }
@@ -36,7 +36,7 @@ public class Console {
                 hasResult = true;
 
             } catch (Exception e) {
-                System.out.println("Invalid entry");
+                System.out.println("Invalid input. Please enter a numerical value: Long");
                 scanner.next();
             }
         }
@@ -54,7 +54,7 @@ public class Console {
                 hasResult = true;
 
             } catch (Exception e) {
-                System.out.println("Invalid entry");
+                System.out.println("Invalid input. Please enter a numerical value: Float");
                 scanner.next();
             }
         }
@@ -72,7 +72,7 @@ public class Console {
                 hasResult = true;
 
             } catch (Exception e) {
-                System.out.println("Invalid entry");
+                System.out.println("Invalid input. Please enter a numerical value: Double");
                 scanner.next();
             }
         }
@@ -117,7 +117,7 @@ public class Console {
                     System.out.println("Invalid choice. Please enter a number between 1 and " + options.length + ".");
                 }
             } catch (Exception e) {
-                System.out.println("Invalid input. Please enter a number.");
+                System.out.println("Invalid input. Please enter a numerical value");
             }
         }
     }

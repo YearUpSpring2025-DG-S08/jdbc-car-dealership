@@ -30,6 +30,7 @@ public class UserInterface {
             styledHeader("Welcome to the Dealership!");
 
             String[] menuOptions = new String[]{
+                    "Search by Price",
                     "Search by Make/Model",
                     "Search by Year",
                     "Search by Color",
@@ -97,24 +98,14 @@ public class UserInterface {
         double max;
 
         while (true) {
-            try {
-                System.out.print("Please enter a minimum price: ");
-                min = scanner.nextDouble();
-                System.out.print("Please enter a maximum price: ");
-                max = scanner.nextDouble();
-                scanner.nextLine();
+                min = console.promptForDouble("Please enter a minimum price: ");
+                max = console.promptForDouble("Please enter a maximum price: ");
 
                 if (min > max) {
                     System.out.println("Your minimum price cannot be greater than maximum price");
                     continue;
                 }
-
-
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter a numerical value for price.");
-                scanner.nextLine();
-                return;
-            }
+                
 
             List<Vehicle> results = vehicleDAO.getByPrice(min, max);
             printVehicleInventory(results);
@@ -127,33 +118,29 @@ public class UserInterface {
         // get make/model from the user
         // add formatted header so that users are aware what they are doing
         // in this instance: Searching for vehicle by Make/Model
-
+        System.out.println(StyledUI.styledBoxTitle("Search Vehicles By Make / Model"));
         String[] options = new String[]{"Search by Make", "Search by Model", "Search Make and Model"};
 
         int userChoice = console.promptForOption(options);
 
         switch (userChoice) {
             case 1 -> {
-                String searchMake = console.promptForString("Please enter the Make of the vehicle to Search: ", true);
-                if (!searchMake.isEmpty()) {
+                String searchMake = console.promptForString("Please enter the Make of the vehicle to Search: ");
+                
                     List<Vehicle> carMakeResults = vehicleDAO.getByMake(searchMake);
                     printVehicleInventory(carMakeResults);
-                }
+                
             }
             case 2 -> {
-                String searchModel = console.promptForString("Please enter the Model of the vehicle to Search: ", true);
-                if (!searchModel.isEmpty()) {
+                String searchModel = console.promptForString("Please enter the Model of the vehicle to Search: ");
+                
                     List<Vehicle> carModelResults = vehicleDAO.getByModel(searchModel);
                     printVehicleInventory(carModelResults);
-                }
+                
             }
             case 3 -> {
-                String searchMake = console.promptForString("Please enter the Make of the vehicle to Search ", true);
-                String searchModel = console.promptForString("Please enter the Model of the vehicle to Search ", true);
-                
-                if(searchMake.isEmpty() && searchModel.isEmpty()){
-                    System.out.println("The search criteria cannot be empty");
-                }
+                String searchMake = console.promptForString("Please enter the Make of the vehicle to Search ");
+                String searchModel = console.promptForString("Please enter the Model of the vehicle to Search ");
                 
                 List<Vehicle> searchResults = vehicleDAO.getByMakeModel(searchMake, searchModel);
                 printVehicleInventory(searchResults);

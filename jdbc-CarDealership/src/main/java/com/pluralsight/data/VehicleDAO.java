@@ -41,16 +41,14 @@ public class VehicleDAO {
             s.setDouble(2, maxPrice);
 
             ResultSet queryResults = s.executeQuery();
-
-            // add a logging message to communicate with user
-            if(queryResults.next()){
-                logger.info("✅ Successfully retrieved vehicles within the price range: ${} and ${} ✅", minPrice, maxPrice);
-            } else{
-                logger.warn("❌ No vehicles found within the price range: ${} and ${} ❌", minPrice, maxPrice);
-            }
             
+            
+            // boolean to check whether query results has any rows
+            boolean hasRows = false;
             // loop through results and parse the information to be saved
             while(queryResults.next()){
+                hasRows = true;
+                
                 int vin = queryResults.getInt(1);
                 int year = queryResults.getInt(2);
                 String make = queryResults.getString(3);
@@ -64,7 +62,13 @@ public class VehicleDAO {
                 Vehicle vehicle = new Vehicle(vin, year, make, model, type, color, mileage, price);
                 results.add(vehicle);
             }
-            
+
+            // add a logging message to communicate with user
+            if(hasRows){
+                logger.info("✅ Successfully retrieved vehicles within the price range: ${} and ${} ✅", minPrice, maxPrice);
+            } else{
+                logger.warn("❌ No vehicles found within the price range: ${} and ${} ❌", minPrice, maxPrice);
+            }
             
         } catch (SQLException e) {
             logger.error("Could not query vehicles by price");
@@ -95,15 +99,11 @@ public class VehicleDAO {
 
             ResultSet queryResults = s.executeQuery();
 
-            // add a logging message to communicate with user
-            if(queryResults.next()){
-                logger.info("✅ Successfully retrieved vehicles with the make: {} ✅", userChosenMake);
-            } else{
-                logger.warn("❌ No vehicles found with make: {} ❌", userChosenMake);
-            }
-
+            // boolean to check whether query results has any rows
+            boolean hasRows = false;
             // loop through results and parse the information to be saved
             while(queryResults.next()){
+                hasRows = true;
                 int vin = queryResults.getInt(1);
                 int year = queryResults.getInt(2);
                 String make = queryResults.getString(3);
@@ -118,6 +118,12 @@ public class VehicleDAO {
                 results.add(vehicle);
             }
 
+            // add a logging message to communicate with user
+            if(hasRows){
+                logger.info("✅ Successfully retrieved vehicles with the make: {} ✅", userChosenMake);
+            } else{
+                logger.warn("❌ No vehicles found with make: {} ❌", userChosenMake);
+            }
 
         } catch (SQLException e) {
             logger.error("Could not query vehicles by make");
@@ -148,15 +154,11 @@ public class VehicleDAO {
 
             ResultSet queryResults = s.executeQuery();
 
-            // add a logging message to communicate with user
-            if(queryResults.next()){
-                logger.info("✅ Successfully retrieved vehicles with the model: {} ✅", userChosenModel);
-            } else{
-                logger.warn("❌ No vehicles found with the model: {} ❌", userChosenModel);
-            }
-
+            // boolean to check whether query results has any rows
+            boolean hasRows = false;
             // loop through results and parse the information to be saved
             while(queryResults.next()){
+                hasRows = true;
                 int vin = queryResults.getInt(1);
                 int year = queryResults.getInt(2);
                 String make = queryResults.getString(3);
@@ -171,6 +173,12 @@ public class VehicleDAO {
                 results.add(vehicle);
             }
 
+            // add a logging message to communicate with user
+            if(hasRows){
+                logger.info("✅ Successfully retrieved vehicles with the model: {} ✅", userChosenModel);
+            } else{
+                logger.warn("❌ No vehicles found with the model: {} ❌", userChosenModel);
+            }
 
         } catch (SQLException e) {
             logger.error("Could not query vehicles by model");
@@ -201,16 +209,13 @@ public class VehicleDAO {
             s.setString(2, userChoseModel);
 
             ResultSet queryResults = s.executeQuery();
+            
 
-            // add a logging message to communicate with user
-            if(queryResults.next()){
-                logger.info("✅ Successfully retrieved vehicles with the make and model: {} {}✅", userChosenMake, userChoseModel);
-            } else{
-                logger.warn("❌ No vehicles found with make and model: {} {}❌", userChosenMake, userChoseModel);
-            }
-
+            // boolean to check whether query results has any rows
+            boolean hasRows = false;
             // loop through results and parse the information to be saved
             while(queryResults.next()){
+                hasRows = true;
                 int vin = queryResults.getInt(1);
                 int year = queryResults.getInt(2);
                 String make = queryResults.getString(3);
@@ -225,6 +230,12 @@ public class VehicleDAO {
                 results.add(vehicle);
             }
 
+            // add a logging message to communicate with user
+            if(hasRows){
+                logger.info("✅ Successfully retrieved vehicles with the make and model: {} {}✅", userChosenMake, userChoseModel);
+            } else{
+                logger.warn("❌ No vehicles found with make and model: {} {}❌", userChosenMake, userChoseModel);
+            }
 
         } catch (SQLException e) {
             logger.error("Could not query vehicles by make and model");
