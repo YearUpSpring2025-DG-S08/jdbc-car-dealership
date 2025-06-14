@@ -1,7 +1,5 @@
 package com.pluralsight.models;
 
-import com.pluralsight.Vehicle;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +9,7 @@ public class Dealership {
     private String name;
     private String address;
     private String phoneNumber;
-    private final DealershipFileManager fileManager = new DealershipFileManager();
+//    private final DealershipFileManager fileManager = new DealershipFileManager();
     public List<Vehicle> inventory = new ArrayList<>();
     
     // constructor
@@ -143,16 +141,16 @@ public class Dealership {
         return inventory;
     }
 
-    // file modifier methods
-    public void addVehicle(Vehicle vehicle) {
-        //add this vehicle to the inventory of this dealership
-        inventory.add(vehicle);
-        fileManager.saveDealership(this);
-    }
-    
-    public void removeVehicle(Vehicle vehicle){
-        // remove this vehicle from the inventory of the dealership
-        inventory.remove(vehicle);
-        fileManager.saveDealership(this);
-    }
+//    // file modifier methods
+//    public void addVehicle(Vehicle vehicle) {
+//        //add this vehicle to the inventory of this dealership
+//        inventory.add(vehicle);
+//        fileManager.saveDealership(this);
+//    }
+//    
+//    public void removeVehicle(Vehicle vehicle){
+//        // remove this vehicle from the inventory of the dealership
+//        inventory.remove(vehicle);
+//        fileManager.saveDealership(this);
+//    }
 }

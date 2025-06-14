@@ -1,6 +1,6 @@
 package com.pluralsight.models;
 
-@SuppressWarnings("ALL")
+
 public class SalesContract extends Contract{
     private double salesTax; // total price * .5
     private double recordingFee; // 100

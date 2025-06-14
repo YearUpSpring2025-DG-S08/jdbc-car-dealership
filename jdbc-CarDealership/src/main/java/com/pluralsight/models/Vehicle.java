@@ -1,6 +1,6 @@
 package com.pluralsight.models;
 
-@SuppressWarnings("ALL")
+
 public class Vehicle {
     // instance variables
     private int vin;

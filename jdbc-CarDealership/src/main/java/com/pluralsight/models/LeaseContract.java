@@ -1,6 +1,6 @@
 package com.pluralsight.models;
 
-@SuppressWarnings("ALL")
+
 public class LeaseContract extends Contract{
     
     private double endingValue;

@@ -1,7 +1,5 @@
 package com.pluralsight.models;
 
-import com.pluralsight.Vehicle;
-
 public abstract class Contract {
     // instance variables
     private String Date;

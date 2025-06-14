@@ -1,6 +1,7 @@
 package com.pluralsight.ui;
 
-import static com.pluralsight.ColorCodes.*;
+
+import static com.pluralsight.ui.ColorCodes.*;
 
 public class StyledUI {
     
