@@ -13,7 +13,7 @@ public class UserInterface {
     private final Console console = new Console();
     private final Scanner scanner = new Scanner(System.in);
     private final VehicleDAO vehicleDAO;
-    
+
     // constructor method
     public UserInterface(VehicleDAO vehicleDAO) {
         this.vehicleDAO = vehicleDAO;
@@ -25,32 +25,30 @@ public class UserInterface {
         // this helper method will display the menu for the User to make a selection
         // for which process they would like to choose
         // will include accepting user input within this method
-        int input = 0;
-        while(input != -1) {
+        while (true) {
 //            printDealershipInfo(this.dealership); // change this to DealershipDAO
             styledHeader("Welcome to the Dealership!");
-            String welcomeMenuPrompt ="""
-                    [1] Search by Price
-                    [2] Search by Make/Model
-                    [3] Search by Year
-                    [4] Search by Color
-                    [5] Search by Mileage
-                    [6] Search by Vehicle Type
-                    [7] Search All Vehicles
-                    [8] Add Vehicle to lot
-                    [9] Remove Vehicle from lot
-                    [10] Sell a Vehicle
-                    [11] Lease a Vehicle
-                    """;
 
-            input = console.promptForInt(welcomeMenuPrompt);
+            String[] menuOptions = new String[]{
+                    "Search by Make/Model",
+                    "Search by Year",
+                    "Search by Color",
+                    "Search by Mileage",
+                    "Search by Vehicle Type",
+                    "Search All Vehicles",
+                    "Add Vehicle to Lot",
+                    "Remove Vehicle from Lot",
+                    "Sell a Vehicle",
+                    "Lease a Vehicle",
+                    "Exit Program"};
 
-            switch (input) {
+            int userChoice = console.promptForOption(menuOptions);
+            switch (userChoice) {
                 case 1:
                     processGetByPriceRequest();
                     break;
                 case 2:
-//                    processGetByMakeModelRequest();
+                    processGetByMakeModelRequest();
                     break;
                 case 3:
 //                    processGetByYearRequest();
@@ -79,11 +77,14 @@ public class UserInterface {
                 case 11:
 //                    processLeaseContract();
                     break;
+                case 12:
+                    System.out.println("Thank you for coming to the dealership!");
+                    return;
                 default:
                     System.out.println("Please make a selection from the menu");
             }
         }
-        
+
     }
 
     // processing methods for user requests
@@ -92,10 +93,10 @@ public class UserInterface {
         // add formatted header so that users are aware what they are doing
         // in this instance: Searching for vehicle by price
         System.out.println(StyledUI.styledBoxTitle("Search Vehicles By Price"));
-        double min = 0;
-        double max = 0;
+        double min;
+        double max;
 
-        while(true) {
+        while (true) {
             try {
                 System.out.print("Please enter a minimum price: ");
                 min = scanner.nextDouble();
@@ -114,7 +115,7 @@ public class UserInterface {
                 scanner.nextLine();
                 return;
             }
-            
+
             List<Vehicle> results = vehicleDAO.getByPrice(min, max);
             printVehicleInventory(results);
             break;
@@ -122,6 +123,48 @@ public class UserInterface {
 
     }
 
+    private void processGetByMakeModelRequest() {
+        // get make/model from the user
+        // add formatted header so that users are aware what they are doing
+        // in this instance: Searching for vehicle by Make/Model
+
+        String[] options = new String[]{"Search by Make", "Search by Model", "Search Make and Model"};
+
+        int userChoice = console.promptForOption(options);
+
+        switch (userChoice) {
+            case 1 -> {
+                String searchMake = console.promptForString("Please enter the Make of the vehicle to Search: ", true);
+                if (!searchMake.isEmpty()) {
+                    List<Vehicle> carMakeResults = vehicleDAO.getByMake(searchMake);
+                    printVehicleInventory(carMakeResults);
+                }
+            }
+            case 2 -> {
+                String searchModel = console.promptForString("Please enter the Model of the vehicle to Search: ", true);
+                if (!searchModel.isEmpty()) {
+                    List<Vehicle> carModelResults = vehicleDAO.getByModel(searchModel);
+                    printVehicleInventory(carModelResults);
+                }
+            }
+            case 3 -> {
+                String searchMake = console.promptForString("Please enter the Make of the vehicle to Search ", true);
+                String searchModel = console.promptForString("Please enter the Model of the vehicle to Search ", true);
+                
+                if(searchMake.isEmpty() && searchModel.isEmpty()){
+                    System.out.println("The search criteria cannot be empty");
+                }
+                
+                List<Vehicle> searchResults = vehicleDAO.getByMakeModel(searchMake, searchModel);
+                printVehicleInventory(searchResults);
+                
+                
+            }
+            default -> System.out.println("Invalid entry. Please Try Again.");
+        }
+    }
+
+    
     // helper method
     public void printVehicleInventory(List<Vehicle> vehicles) {
         if (vehicles == null || vehicles.isEmpty()) {
@@ -139,7 +182,5 @@ public class UserInterface {
 
         System.out.println();
     }
-    
-    
     
 }

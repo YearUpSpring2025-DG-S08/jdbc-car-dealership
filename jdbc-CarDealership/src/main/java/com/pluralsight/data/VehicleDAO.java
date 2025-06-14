@@ -180,6 +180,60 @@ public class VehicleDAO {
         return results;
     }
     
+    public List<Vehicle> getByMakeModel(String userChosenMake, String userChoseModel){
+        // we need a place to hold the results
+        ArrayList<Vehicle> results = new ArrayList<>();
+
+        // we need to ask for the data
+        String query = """
+                SELECT VIN, year, make, model, type, color, mileage, price
+                FROM car_dealership.vehicles v
+                WHERE make = ? AND model = ?
+                """;
+
+        // we need to make a connection to the database, send a prepared statement of the query, and execute it
+        try(Connection c = dataSource.getConnection();
+            PreparedStatement s = c.prepareStatement(query))
+        {
+
+            // protect from sql injection
+            s.setString(1, userChosenMake);
+            s.setString(2, userChoseModel);
+
+            ResultSet queryResults = s.executeQuery();
+
+            // add a logging message to communicate with user
+            if(queryResults.next()){
+                logger.info("✅ Successfully retrieved vehicles with the make and model: {} {}✅", userChosenMake, userChoseModel);
+            } else{
+                logger.warn("❌ No vehicles found with make and model: {} {}❌", userChosenMake, userChoseModel);
+            }
+
+            // loop through results and parse the information to be saved
+            while(queryResults.next()){
+                int vin = queryResults.getInt(1);
+                int year = queryResults.getInt(2);
+                String make = queryResults.getString(3);
+                String model = queryResults.getString(4);
+                String type = queryResults.getString(5);
+                String color = queryResults.getString(6);
+                double mileage = queryResults.getDouble(7);
+                double price = queryResults.getDouble(8);
+
+                // create a new instance of the Vehicle model and add to the array to be returned
+                Vehicle vehicle = new Vehicle(vin, year, make, model, type, color, mileage, price);
+                results.add(vehicle);
+            }
+
+
+        } catch (SQLException e) {
+            logger.error("Could not query vehicles by make and model");
+        }
+
+
+        return results;
+    }
+    
     public List<Vehicle> getByYear(double minYear, double maxYear){
         // we need a place to hold the results
         ArrayList<Vehicle> results = new ArrayList<>();
@@ -233,8 +287,7 @@ public class VehicleDAO {
 
         return results;
     }
-
-
+    
     public List<Vehicle> getByColor(String userChosenColor){
         // we need a place to hold the results
         ArrayList<Vehicle> results = new ArrayList<>();
@@ -287,7 +340,6 @@ public class VehicleDAO {
 
         return results;
     }
-
 
     public List<Vehicle> getByMileage(double minMileage, double maxMileage){
         // we need a place to hold the results
@@ -395,7 +447,6 @@ public class VehicleDAO {
 
         return results;
     }
-
     
     public List<Vehicle> getAllVehicles(){
         // we need a place to hold the results

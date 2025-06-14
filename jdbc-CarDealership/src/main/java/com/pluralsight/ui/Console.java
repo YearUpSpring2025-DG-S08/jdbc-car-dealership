@@ -110,7 +110,7 @@ public class Console {
             }
 
             try {
-                int choice = promptForInt("Select option (1–" + options.length + "): ");
+                int choice = promptForInt("Select option (1–" + options.length + "): \n");
                 if (choice >= 1 && choice <= options.length) {
                     return choice;
                 } else {
