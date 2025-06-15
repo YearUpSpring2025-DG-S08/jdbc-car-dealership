@@ -93,9 +93,8 @@ public class Vehicle {
     // display methods
     @Override
     public String toString() {
-        String data = String.format("%d|%s|%s|%s|%s|%s|%.0f|%.0f"
+        return String.format("%d|%s|%s|%s|%s|%s|%.0f|%.0f"
                 , vin, year, make, model, type, color, mileage, price);
-        return data;
     }
     
     public String toFormattedRow() {

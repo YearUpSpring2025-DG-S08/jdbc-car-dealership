@@ -5,6 +5,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,6 +19,62 @@ public class VehicleDAO {
 
     public VehicleDAO(BasicDataSource dataSource) {
         this.dataSource = dataSource;
+    }
+    
+    // search query methods
+    public Vehicle getByVin(int userChosenVin){
+        Vehicle queryVehicle = null;
+        
+        // we need to ask for the data
+        String query = """
+                SELECT VIN, year, make, model, type, color, mileage, price
+                FROM car_dealership.vehicles v
+                WHERE VIN = ?
+                """;
+
+        // we need to make a connection to the database, send a prepared statement of the query, and execute it
+        try(Connection c = dataSource.getConnection();
+            PreparedStatement s = c.prepareStatement(query))
+        {
+
+            // protect from sql injection
+            s.setInt(1, userChosenVin);
+
+            ResultSet queryResults = s.executeQuery();
+
+
+            // boolean to check whether query results has any rows
+            boolean hasRows = false;
+            // loop through results and parse the information to be saved
+            while(queryResults.next()){
+                hasRows = true;
+
+                int vin = queryResults.getInt(1);
+                int year = queryResults.getInt(2);
+                String make = queryResults.getString(3);
+                String model = queryResults.getString(4);
+                String type = queryResults.getString(5);
+                String color = queryResults.getString(6);
+                double mileage = queryResults.getDouble(7);
+                double price = queryResults.getDouble(8);
+
+                // create a new instance of the Vehicle model and add to the array to be returned
+                queryVehicle = new Vehicle(vin, year, make, model, type, color, mileage, price);
+            }
+
+            // add a logging message to communicate with user
+            if(hasRows){
+                logger.info("✅ Successfully retrieved vehicles with the vin: {} ✅", userChosenVin);
+            } else{
+                logger.warn("❌ No vehicles found within the vin: {} ❌", userChosenVin);
+            }
+
+        } catch (SQLException e) {
+            logger.error("Could not query vehicles by vin");
+        }
+
+
+        return queryVehicle;
     }
     
     public List<Vehicle> getByPrice(double minPrice, double maxPrice){
@@ -141,7 +198,7 @@ public class VehicleDAO {
         String query = """
                 SELECT VIN, year, make, model, type, color, mileage, price
                 FROM car_dealership.vehicles v
-                WHERE model = ?
+                WHERE model = ?;
                 """;
 
         // we need to make a connection to the database, send a prepared statement of the query, and execute it
@@ -196,7 +253,7 @@ public class VehicleDAO {
         String query = """
                 SELECT VIN, year, make, model, type, color, mileage, price
                 FROM car_dealership.vehicles v
-                WHERE make = ? AND model = ?
+                WHERE make = ? AND model = ?;
                 """;
 
         // we need to make a connection to the database, send a prepared statement of the query, and execute it
@@ -253,7 +310,8 @@ public class VehicleDAO {
         String query = """
                 SELECT VIN, year, make, model, type, color, mileage, price
                 FROM car_dealership.vehicles v
-                WHERE year >= ? AND year <= ?
+                WHERE year
+                BETWEEN ? AND ?;
                 """;
 
         // we need to make a connection to the database, send a prepared statement of the query, and execute it
@@ -267,15 +325,11 @@ public class VehicleDAO {
 
             ResultSet queryResults = s.executeQuery();
 
-            // add a logging message to communicate with user
-            if(queryResults.next()){
-                logger.info("✅ Successfully retrieved vehicles within the year range: {} and {} ✅", minYear, maxYear);
-            } else{
-                logger.warn("❌ No vehicles found within the year range: {} and {} ❌", minYear, maxYear);
-            }
-
+            // boolean to check whether query results has any rows
+            boolean hasRows = false;
             // loop through results and parse the information to be saved
             while(queryResults.next()){
+                hasRows = true;
                 int vin = queryResults.getInt(1);
                 int year = queryResults.getInt(2);
                 String make = queryResults.getString(3);
@@ -288,6 +342,13 @@ public class VehicleDAO {
                 // create a new instance of the Vehicle model and add to the array to be returned
                 Vehicle vehicle = new Vehicle(vin, year, make, model, type, color, mileage, price);
                 results.add(vehicle);
+            }
+
+            // add a logging message to communicate with user
+            if(hasRows){
+                logger.info("✅ Successfully retrieved vehicles within the year range: {} and {} ✅", (int) minYear, (int) maxYear);
+            } else{
+                logger.warn("❌ No vehicles found within the year range: {} and {} ❌", (int) minYear, (int) maxYear);
             }
 
 
@@ -320,15 +381,11 @@ public class VehicleDAO {
 
             ResultSet queryResults = s.executeQuery();
 
-            // add a logging message to communicate with user
-            if(queryResults.next()){
-                logger.info("✅ Successfully retrieved vehicles with the color: {} ✅", userChosenColor);
-            } else{
-                logger.warn("❌ No vehicles found with the color: {} ❌", userChosenColor);
-            }
-
+            // boolean to check whether query results has any rows
+            boolean hasRows = false;
             // loop through results and parse the information to be saved
             while(queryResults.next()){
+                hasRows = true;
                 int vin = queryResults.getInt(1);
                 int year = queryResults.getInt(2);
                 String make = queryResults.getString(3);
@@ -341,6 +398,13 @@ public class VehicleDAO {
                 // create a new instance of the Vehicle model and add to the array to be returned
                 Vehicle vehicle = new Vehicle(vin, year, make, model, type, color, mileage, price);
                 results.add(vehicle);
+            }
+
+            // add a logging message to communicate with user
+            if(hasRows){
+                logger.info("✅ Successfully retrieved vehicles with the color: {} ✅", userChosenColor);
+            } else{
+                logger.warn("❌ No vehicles found with the color: {} ❌", userChosenColor);
             }
 
 
@@ -360,7 +424,8 @@ public class VehicleDAO {
         String query = """
                 SELECT VIN, year, make, model, type, color, mileage, price
                 FROM car_dealership.vehicles v
-                WHERE mileage <= ? AND mileage >= ?;
+                WHERE mileage
+                BETWEEN ? AND ?
                 """;
 
         // we need to make a connection to the database, send a prepared statement of the query, and execute it
@@ -373,16 +438,13 @@ public class VehicleDAO {
             s.setDouble(2, maxMileage);
 
             ResultSet queryResults = s.executeQuery();
+            
 
-            // add a logging message to communicate with user
-            if(queryResults.next()){
-                logger.info("✅ Successfully retrieved vehicles within the range: {} and {} ✅", minMileage, maxMileage);
-            } else{
-                logger.warn("❌ No vehicles found within the range: {} and {} ❌", minMileage, maxMileage);
-            }
-
+            // boolean to check whether query results has any rows
+            boolean hasRows = false;
             // loop through results and parse the information to be saved
             while(queryResults.next()){
+                hasRows = true;
                 int vin = queryResults.getInt(1);
                 int year = queryResults.getInt(2);
                 String make = queryResults.getString(3);
@@ -395,6 +457,13 @@ public class VehicleDAO {
                 // create a new instance of the Vehicle model and add to the array to be returned
                 Vehicle vehicle = new Vehicle(vin, year, make, model, type, color, mileage, price);
                 results.add(vehicle);
+            }
+
+            // add a logging message to communicate with user
+            if(hasRows){
+                logger.info("✅ Successfully retrieved vehicles within the mileage range: {} and {} ✅", (int) minMileage, (int) maxMileage);
+            } else{
+                logger.warn("❌ No vehicles found within the mileage range: {} and {} ❌", (int) minMileage, (int) maxMileage);
             }
 
 
@@ -427,15 +496,11 @@ public class VehicleDAO {
 
             ResultSet queryResults = s.executeQuery();
 
-            // add a logging message to communicate with user
-            if(queryResults.next()){
-                logger.info("✅ Successfully retrieved vehicles with the type: {} ✅", userChosenVehicleType);
-            } else{
-                logger.warn("❌ No vehicles found with the type: {} ❌", userChosenVehicleType);
-            }
-
+            // boolean to check whether query results has any rows
+            boolean hasRows = false;
             // loop through results and parse the information to be saved
             while(queryResults.next()){
+                hasRows = true;
                 int vin = queryResults.getInt(1);
                 int year = queryResults.getInt(2);
                 String make = queryResults.getString(3);
@@ -450,6 +515,13 @@ public class VehicleDAO {
                 results.add(vehicle);
             }
 
+
+            // add a logging message to communicate with user
+            if(hasRows){
+                logger.info("✅ Successfully retrieved vehicles with the type: {} ✅", userChosenVehicleType);
+            } else{
+                logger.warn("❌ No vehicles found with the type: {} ❌", userChosenVehicleType);
+            }
 
         } catch (SQLException e) {
             logger.error("Could not query vehicles by type");
@@ -476,15 +548,11 @@ public class VehicleDAO {
         )
         {
 
-            // add a logging message to communicate with user
-            if(queryResults.next()){
-                logger.info("✅ Successfully retrieved vehicles ✅");
-            } else{
-                logger.warn("❌ No vehicles found ❌");
-            }
-
+            // boolean to check whether query results has any rows
+            boolean hasRows = false;
             // loop through results and parse the information to be saved
             while(queryResults.next()){
+                hasRows = true;
                 int vin = queryResults.getInt(1);
                 int year = queryResults.getInt(2);
                 String make = queryResults.getString(3);
@@ -499,7 +567,13 @@ public class VehicleDAO {
                 results.add(vehicle);
             }
 
-
+            // add a logging message to communicate with user
+            if(hasRows){
+                logger.info("✅ Successfully retrieved vehicles ✅");
+            } else{
+                logger.warn("❌ No vehicles found ❌");
+            }
+            
         } catch (SQLException e) {
             logger.error("Could not query vehicles");
         }
@@ -508,5 +582,90 @@ public class VehicleDAO {
         return results;
     }
     
+    // insert data method
+    public void addVehicle(Vehicle vehicle){
+        // we need to add the given vehicle to the database using an INSERT statement
+        String insertQuery = """
+                INSERT into vehicles (VIN, year, make, model, type, color, mileage, price)
+                values (?, ?, ? , ?, ?, ?, ?, ?);
+                """;
+        
+        try(Connection c = dataSource.getConnection();
+        PreparedStatement s = c.prepareStatement(insertQuery)
+        )
+        {
+            
+            s.setInt(1, vehicle.getVin());
+            s.setInt(2, vehicle.getYear());
+            s.setString(3, vehicle.getMake());
+            s.setString(4, vehicle.getModel());
+            s.setString(5, vehicle.getType());
+            s.setString(6, vehicle.getColor());
+            s.setInt(7, (int) vehicle.getMileage());
+            s.setBigDecimal(8, BigDecimal.valueOf(vehicle.getPrice()));
 
+            int rowsAffected = s.executeUpdate();
+            
+            // add a logging message to communicate with user
+            if(rowsAffected > 0) {
+                logger.info("✅ Successfully added a new vehicle to the dealership inventory ✅");
+            }
+            
+        } catch (SQLException e) {
+            logger.error("❌ Could not add new vehicle to dealership inventory ❌");
+        }
+    }
+
+    
+    // remove data method
+    public void removeVehicle(int vin){
+        // we need to take the given vin and match to a vehicle within the database to remove
+        // refactor code to set a helper method to delete from inventory, vehicle, and contracts tables
+        try( Connection c = dataSource.getConnection())
+        {
+            String deleteFromInventoryQuery = """
+                DELETE FROM car_dealership.inventory i
+                WHERE vin = ?;
+                """;
+            
+            try(PreparedStatement s = c.prepareStatement(deleteFromInventoryQuery))
+            {
+                s.setInt(1, vin);
+                
+                s.executeUpdate();
+            }
+            
+            // have to add condition to delete a vehicle from the contracts tables if it applies
+            // most likely will need to create a helper method to check
+            
+        String deleteFromVehicleQuery = """
+                DELETE FROM car_dealership.vehicles v
+                WHERE vin = ?;
+                """;
+        
+            try (PreparedStatement s1 = c.prepareStatement(deleteFromVehicleQuery)
+            )
+            {
+                
+                s1.setInt(1, vin);
+                
+                int rowsAffected = s1.executeUpdate();
+    
+                // add a logging message to communicate with user
+                if(rowsAffected > 0) {
+                    logger.info("✅ Successfully removed a vehicle from dealership vehicles ✅");
+                }
+                
+            } catch (SQLException e) {
+                logger.error("❌ Could not remove vehicle from dealership vehicles ❌");
+                System.out.println(e.getMessage());
+            }
+            
+        } catch (SQLException ex){
+    logger.error("❌ Could not remove vehicle from dealership inventory ❌");
+        }
+    }
+    
+    
 }
+

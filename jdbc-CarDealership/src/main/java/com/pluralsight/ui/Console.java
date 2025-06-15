@@ -91,7 +91,7 @@ public class Console {
             if (input.isEmpty() && !allowEmpty) {
                 System.out.println("Input cannot be empty.");
             } else {
-                if(input.length() >= 2){
+                if(input.length() >= 4){
                     return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
                 }
                 else{
