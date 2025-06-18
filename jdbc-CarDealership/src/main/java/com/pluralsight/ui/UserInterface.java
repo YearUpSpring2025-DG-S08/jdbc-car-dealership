@@ -3,6 +3,7 @@ package com.pluralsight.ui;
 import com.pluralsight.data.DealershipDAO;
 import com.pluralsight.data.LeaseContractDAO;
 import com.pluralsight.data.SalesContractDAO;
+import com.pluralsight.models.LeaseContract;
 import com.pluralsight.models.SalesContract;
 import com.pluralsight.models.Vehicle;
 
@@ -85,7 +86,7 @@ public class UserInterface {
                     processSalesContract();
                     break;
                 case 11:
-//                    processLeaseContract();
+                    processLeaseContract();
                     break;
                 case 12:
                     System.out.println("Thank you for coming to the dealership!");
@@ -276,7 +277,7 @@ public class UserInterface {
     }
 
     private void processSalesContract() {
-        System.out.println(StyledUI.styledBoxTitle("Remove a Vehicle From the Dealership lot"));
+        System.out.println(StyledUI.styledBoxTitle("Purchase a Sales Contract"));
         List<Vehicle> allVehicles = dealershipDAO.getAllVehicles();
         printVehicleInventory(allVehicles);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -329,6 +330,55 @@ public class UserInterface {
         
 
         
+    }
+    
+    private void processLeaseContract() {
+        System.out.println(StyledUI.styledBoxTitle("Purchase a Lease Contract"));
+        List<Vehicle> allVehicles = dealershipDAO.getAllVehicles();
+        printVehicleInventory(allVehicles);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // create loop for potential InputErrorMismatch
+        int vin;
+        while (true) {
+            vin = console.promptForInt("Please enter the vin number of the vehicle you want to buy: ");
+
+            if (vin >= 11111 && vin <= 99999) {
+                break;
+            } else {
+                System.out.println("Invalid VIN. Please try again.");
+            }
+
+
+            System.out.println("You have chosen: \n"
+                    + StyledUI.FormattedTextHeader() + "\n"
+                    + dealershipDAO.getByVin(vin).toFormattedRow() + "\n"
+                    + "\nAre you sure you want to buy this vehicle? \n");
+
+            String[] options = new String[]{"Yes", "No"};
+            int confirmPurchase = console.promptForOption(options);
+
+            if (confirmPurchase == 1) {
+                String dateOfPurchase = LocalDateTime.now().format(formatter);
+                String customerName = console.promptForString("Please enter your full name: ");
+                String customerEmail = console.promptForString("Please enter your email address: ");
+                Vehicle purchasedVehicle = dealershipDAO.getByVin(vin);
+
+                LeaseContract newContract = new LeaseContract(dateOfPurchase, customerName, customerEmail, purchasedVehicle, 0, 0);
+
+                if (newContract != null) {
+                    leaseContractDAO.addLeaseContract(newContract);
+                    break;
+                } else {
+                    System.out.println("Could not complete a new sales contract");
+                }
+
+
+            } else {
+                return;
+            }
+
+        }
     }
     
     // helper method

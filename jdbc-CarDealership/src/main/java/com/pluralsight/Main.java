@@ -20,7 +20,7 @@ public class Main {
         BasicDataSource basicDataSource = getBasicDataSourceFromArgs(args);
         DealershipDAO dealershipDAO = new DealershipDAO(basicDataSource);
         SalesContractDAO salesContractDAO = new SalesContractDAO(basicDataSource, dealershipDAO);
-        LeaseContractDAO leaseContractDAO = new LeaseContractDAO(basicDataSource);
+        LeaseContractDAO leaseContractDAO = new LeaseContractDAO(basicDataSource, dealershipDAO);
         
         
         UserInterface ui = new UserInterface(dealershipDAO, salesContractDAO, leaseContractDAO);

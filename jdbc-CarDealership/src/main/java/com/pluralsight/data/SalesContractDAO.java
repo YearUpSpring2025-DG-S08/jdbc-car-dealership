@@ -11,11 +11,11 @@ import java.sql.SQLException;
 
 public class SalesContractDAO {
     private static final Logger logger = LogManager.getLogger(SalesContractDAO.class);
-    private final BasicDataSource dataSource;
+    private final BasicDataSource bds;
     private final DealershipDAO dealershipDAO;
 
-    public SalesContractDAO(BasicDataSource dataSource, DealershipDAO dealershipDAO) {
-        this.dataSource = dataSource;
+    public SalesContractDAO(BasicDataSource bds, DealershipDAO dealershipDAO) {
+        this.bds = bds;
         this.dealershipDAO = dealershipDAO;
     }
     
@@ -28,7 +28,7 @@ public class SalesContractDAO {
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         
-        try(Connection c = dataSource.getConnection();
+        try(Connection c = bds.getConnection();
             PreparedStatement s = c.prepareStatement(addNewContract)
         )
         {
