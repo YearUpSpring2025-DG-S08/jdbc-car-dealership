@@ -1,7 +1,9 @@
 package com.pluralsight;
 
 
-import com.pluralsight.data.VehicleDAO;
+import com.pluralsight.data.DealershipDAO;
+import com.pluralsight.data.LeaseContractDAO;
+import com.pluralsight.data.SalesContractDAO;
 import com.pluralsight.ui.UserInterface;
 import org.apache.commons.dbcp2.BasicDataSource;
 
@@ -16,10 +18,12 @@ public class Main {
         }
 
         BasicDataSource basicDataSource = getBasicDataSourceFromArgs(args);
-        VehicleDAO vehicleDAO = new VehicleDAO(basicDataSource);
+        DealershipDAO dealershipDAO = new DealershipDAO(basicDataSource);
+        SalesContractDAO salesContractDAO = new SalesContractDAO(basicDataSource, dealershipDAO);
+        LeaseContractDAO leaseContractDAO = new LeaseContractDAO(basicDataSource);
         
         
-        UserInterface ui = new UserInterface(vehicleDAO);
+        UserInterface ui = new UserInterface(dealershipDAO, salesContractDAO, leaseContractDAO);
         
         
     }

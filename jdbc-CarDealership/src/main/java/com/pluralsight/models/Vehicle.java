@@ -11,10 +11,11 @@ public class Vehicle {
     private String color;
     private double mileage;
     private double price;
+    private boolean hasContract;
 
     // constructor
     public Vehicle(int vin, int year, String make, String model, String type, String color, double mileage,
-                   double price) {
+                   double price, boolean hasContract) {
         this.vin = vin;
         this.year = year;
         this.make = make;
@@ -23,6 +24,7 @@ public class Vehicle {
         this.color = color;
         this.mileage = mileage;
         this.price = price;
+        this.hasContract = false;
     }
 
     // getters & setters
@@ -90,6 +92,14 @@ public class Vehicle {
         this.type = type;
     }
 
+    public boolean isHasContract() {
+        return hasContract;
+    }
+
+    public void setHasContract(boolean hasContract) {
+        this.hasContract = hasContract;
+    }
+    
     // display methods
     @Override
     public String toString() {
@@ -108,4 +118,5 @@ public class Vehicle {
         String.format("%,d", (int) mileage),
         String.format("$%,.2f", price));
     }
+
 }

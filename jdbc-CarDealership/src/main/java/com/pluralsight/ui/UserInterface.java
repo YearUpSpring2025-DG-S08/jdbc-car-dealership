@@ -1,26 +1,33 @@
 package com.pluralsight.ui;
 
-import com.pluralsight.data.VehicleDAO;
+import com.pluralsight.data.DealershipDAO;
+import com.pluralsight.data.LeaseContractDAO;
+import com.pluralsight.data.SalesContractDAO;
+import com.pluralsight.models.SalesContract;
 import com.pluralsight.models.Vehicle;
 
-import javax.swing.tree.VariableHeightLayoutCache;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Random;
-import java.util.Scanner;
 
 import static com.pluralsight.ui.StyledUI.styledHeader;
 
 public class UserInterface {
     private final Console console = new Console();
-    private final Scanner scanner = new Scanner(System.in);
-    private final VehicleDAO vehicleDAO;
+    private final DealershipDAO dealershipDAO;
+    private final SalesContractDAO salesContractDAO;
+    private final LeaseContractDAO leaseContractDAO;
 
     // constructor method
-    public UserInterface(VehicleDAO vehicleDAO) {
-        this.vehicleDAO = vehicleDAO;
+    public UserInterface(DealershipDAO dealershipDAO, SalesContractDAO salesContractDAO, LeaseContractDAO leaseContractDAO) {
+        this.dealershipDAO = dealershipDAO;
+        this.salesContractDAO = salesContractDAO;
+        this.leaseContractDAO = leaseContractDAO;
         displayMenu();
     }
+    
 
     // user interface display menu method
     private void displayMenu() {
@@ -75,7 +82,7 @@ public class UserInterface {
                     processRemoveVehicleRequest();
                     break;
                 case 10:
-//                    processSalesContract();
+                    processSalesContract();
                     break;
                 case 11:
 //                    processLeaseContract();
@@ -109,7 +116,7 @@ public class UserInterface {
                 }
                 
 
-            List<Vehicle> results = vehicleDAO.getByPrice(minPrice, maxPrice);
+            List<Vehicle> results = dealershipDAO.getByPrice(minPrice, maxPrice);
             printVehicleInventory(results);
             break;
         }
@@ -128,14 +135,14 @@ public class UserInterface {
             case 1 -> {
                 String searchMake = console.promptForString("Please enter a make: ");
                 
-                    List<Vehicle> carMakeResults = vehicleDAO.getByMake(searchMake);
+                    List<Vehicle> carMakeResults = dealershipDAO.getByMake(searchMake);
                     printVehicleInventory(carMakeResults);
                 
             }
             case 2 -> {
                 String searchModel = console.promptForString("Please enter a model: ");
                 
-                    List<Vehicle> carModelResults = vehicleDAO.getByModel(searchModel);
+                    List<Vehicle> carModelResults = dealershipDAO.getByModel(searchModel);
                     printVehicleInventory(carModelResults);
                 
             }
@@ -143,7 +150,7 @@ public class UserInterface {
                 String searchMake = console.promptForString("Please enter the Make of the vehicle to Search ");
                 String searchModel = console.promptForString("Please enter the Model of the vehicle to Search ");
                 
-                List<Vehicle> searchResults = vehicleDAO.getByMakeModel(searchMake, searchModel);
+                List<Vehicle> searchResults = dealershipDAO.getByMakeModel(searchMake, searchModel);
                 printVehicleInventory(searchResults);
                 
                 
@@ -170,7 +177,7 @@ public class UserInterface {
                 System.out.println("Invalid input. Please enter a numerical value for year.");
             }
             
-            List<Vehicle> results = vehicleDAO.getByYear(minYear, maxYear);
+            List<Vehicle> results = dealershipDAO.getByYear(minYear, maxYear);
             printVehicleInventory(results);
             break;
             
@@ -181,7 +188,7 @@ public class UserInterface {
         System.out.println(StyledUI.styledBoxTitle("Search Vehicles By Color"));
         String userChosenColor = console.promptForString("Please enter a color: ", false);
         
-        List<Vehicle> results = vehicleDAO.getByColor(userChosenColor);
+        List<Vehicle> results = dealershipDAO.getByColor(userChosenColor);
         printVehicleInventory(results);
     }
 
@@ -203,7 +210,7 @@ public class UserInterface {
                 System.out.println("Invalid input. Please enter a numerical value for mileage.");
             }
             
-            List<Vehicle> results = vehicleDAO.getByMileage(minMileage, maxMileage);
+            List<Vehicle> results = dealershipDAO.getByMileage(minMileage, maxMileage);
             printVehicleInventory(results);
             break;
         }
@@ -213,14 +220,14 @@ public class UserInterface {
         System.out.println(StyledUI.styledBoxTitle("Search Vehicles By Vehicle Type"));
         String userChosenVehicleType = console.promptForString("Please enter a vehicle type: ", false);
         
-        List<Vehicle> results = vehicleDAO.getByVehicleType(userChosenVehicleType);
+        List<Vehicle> results = dealershipDAO.getByVehicleType(userChosenVehicleType);
         printVehicleInventory(results);
     }
     
     private void processGetAllVehiclesRequest() {
         System.out.println(StyledUI.styledBoxTitle("Search All Vehicles"));
         
-        List<Vehicle> results = vehicleDAO.getAllVehicles();
+        List<Vehicle> results = dealershipDAO.getAllVehicles();
         printVehicleInventory(results);
     }
     
@@ -237,8 +244,8 @@ public class UserInterface {
         double price = console.promptForDouble("Vehicle Price: ");
 
         try{
-            Vehicle newVehicle = new Vehicle(vin, year, make, model, type, color, mileage, price);
-            vehicleDAO.addVehicle(newVehicle);
+            Vehicle newVehicle = new Vehicle(vin, year, make, model, type, color, mileage, price, false);
+            dealershipDAO.addVehicle(newVehicle);
 
         } catch(Exception e){
             System.out.println("❌ There was an error trying to add this vehicle to the lot ❌");
@@ -247,27 +254,83 @@ public class UserInterface {
     
     private void processRemoveVehicleRequest() {
         System.out.println(StyledUI.styledBoxTitle("Remove a Vehicle From the Dealership lot"));
-        List<Vehicle> results = vehicleDAO.getAllVehicles();
+        List<Vehicle> results = dealershipDAO.getAllVehicles();
         printVehicleInventory(results);
         
         int vin = console.promptForInt("Please enter the vin number of the vehicle you want to remove: ");
 
         System.out.println("You have chosen: \n" 
                 + StyledUI.FormattedTextHeader() + "\n"
-                + vehicleDAO.getByVin(vin).toFormattedRow() + "\n"
+                + dealershipDAO.getByVin(vin).toFormattedRow() + "\n"
                 + "\nAre you sure you want to remove this vehicle? \n");
         
         String[] options = new String[]{"Yes", "No"};
         int confirmDelete = console.promptForOption(options);
         
         if(confirmDelete == 1){
-            vehicleDAO.removeVehicle(vin);
+            dealershipDAO.removeVehicle(vin);
         } else{
-            return;
+            System.out.println("Returning to menu...");
         }
         
     }
 
+    private void processSalesContract() {
+        System.out.println(StyledUI.styledBoxTitle("Remove a Vehicle From the Dealership lot"));
+        List<Vehicle> allVehicles = dealershipDAO.getAllVehicles();
+        printVehicleInventory(allVehicles);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        
+        // create loop for potential InputErrorMismatch
+        int vin;
+        while(true) {
+            vin = console.promptForInt("Please enter the vin number of the vehicle you want to buy: ");
+
+            if (vin >= 11111 && vin <= 99999){
+                break;
+            } else{
+                System.out.println("Invalid VIN. Please try again.");
+            }
+
+
+            System.out.println("You have chosen: \n"
+                    + StyledUI.FormattedTextHeader() + "\n"
+                    + dealershipDAO.getByVin(vin).toFormattedRow() + "\n"
+                    + "\nAre you sure you want to buy this vehicle? \n");
+
+            String[] options = new String[]{"Yes", "No"};
+            int confirmPurchase = console.promptForOption(options);
+
+            if(confirmPurchase == 1){
+                String dateOfPurchase = LocalDateTime.now().format(formatter);
+                String customerName = console.promptForString("Please enter your full name: ");
+                String customerEmail = console.promptForString("Please enter your email address: ");
+                Vehicle purchasedVehicle = dealershipDAO.getByVin(vin);
+                boolean userFinanced;
+                String userChooseFinance = console.promptForString("Would you like to finance the vehicle? (Y/N) ");
+                userFinanced = userChooseFinance.equals("Y");
+                    
+                
+                SalesContract newContract = new SalesContract(dateOfPurchase, customerName, customerEmail, purchasedVehicle, 0, 0, 0, userFinanced);
+
+                if(newContract != null){
+                    salesContractDAO.addSalesContract(newContract);
+                    break;
+                } else {
+                    System.out.println("Could not complete a new sales contract");
+                }
+                
+                
+            } else{
+                return;
+            }
+            
+        }
+        
+
+        
+    }
+    
     // helper method
     public void printVehicleInventory(List<Vehicle> vehicles) {
         if (vehicles == null || vehicles.isEmpty()) {
