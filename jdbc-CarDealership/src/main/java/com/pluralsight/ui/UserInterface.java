@@ -287,7 +287,7 @@ public class UserInterface {
         while(true) {
             vin = console.promptForInt("Please enter the vin number of the vehicle you want to buy: ");
 
-            if (vin >= 11111 && vin <= 99999){
+            if (vin >= 111111111 && vin <= 999999999){
                 break;
             } else{
                 System.out.println("Invalid VIN. Please try again.");
@@ -316,6 +316,7 @@ public class UserInterface {
 
                 if(newContract != null){
                     salesContractDAO.addSalesContract(newContract);
+                    dealershipDAO.removeVehicle(newContract.getVehicleSold().getVin());
                     break;
                 } else {
                     System.out.println("Could not complete a new sales contract");
@@ -343,7 +344,7 @@ public class UserInterface {
         while (true) {
             vin = console.promptForInt("Please enter the vin number of the vehicle you want to buy: ");
 
-            if (vin >= 11111 && vin <= 99999) {
+            if (vin >= 111111111 && vin <= 999999999) {
                 break;
             } else {
                 System.out.println("Invalid VIN. Please try again.");
@@ -368,6 +369,7 @@ public class UserInterface {
 
                 if (newContract != null) {
                     leaseContractDAO.addLeaseContract(newContract);
+                    dealershipDAO.removeVehicle(newContract.getVehicleSold().getVin());
                     break;
                 } else {
                     System.out.println("Could not complete a new sales contract");
@@ -401,7 +403,7 @@ public class UserInterface {
     
     public int generateRandomVin() {
         Random random = new Random();
-        return 10000000 + random.nextInt(90000000);
+        return 100000000 + random.nextInt(900000000);
     }
     
 }
